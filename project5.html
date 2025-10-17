@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Equation Challenge</title>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            color: #4a5568;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .instructions {
+            background: #f7fafc;
+            border-left: 5px solid #4299e1;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .integers-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .integer-box {
+            background: #4299e1;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .integer-box.used {
+            background: #a0aec0;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .equation-area {
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .equation-input {
+            padding: 15px;
+            border: 3px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            width: 200px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .equation-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .equals-sign {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .button:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .button.secondary {
+            background: #718096;
+        }
+
+        .button.secondary:hover {
+            background: #4a5568;
+        }
+
+        .button.success {
+            background: #48bb78;
+        }
+
+        .button.success:hover {
+            background: #38a169;
+        }
+
+        .button.danger {
+            background: #f56565;
+        }
+
+        .button.danger:hover {
+            background: #e53e3e;
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+
+        .demo-area {
+            background: #edf2f7;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .demo-equation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .demo-input {
+            background: #f7fafc;
+            border: 2px solid #cbd5e0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .congratulations {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .equation-area {
+                flex-direction: column;
+            }
+            
+            .equation-input {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .integers-display {
+                gap: 10px;
+            }
+            
+            .integer-box {
+                padding: 10px 15px;
+                font-size: 1.2rem;
+                min-width: 50px;
+            }
+        }
+    </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Screen 1: Welcome Screen -->
+   <div id="screen1" class="screen active">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="instructions"><strong>Game Instructions:</strong><br><br>
+      In each round, you get 6 randomly generated numbers from 1-16. Please make as many equations as possible from any of these numbers (each one to be used once only) and any of math operations: addition (+), subtraction (-), multiplication (*), division (/), and parentheses ( ). You get 10 rounds in each game.
+    </div>
+    <p style="font-size: 1.2rem; margin: 30px 0; color: #4a5568;">Do you want to see a demo of the game?</p><button class="button" onclick="showDemo()">Yes, Show Demo</button> <button class="button secondary" onclick="startGame()">No, Start Game</button>
+   </div><!-- Demo Screen -->
+   <div id="demoScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge - Demo</h1>
+    <div class="demo-area">
+     <h3 style="margin-bottom: 20px; color: #4a5568;">Demo with integers: [6, 4, 7, 3, 13, 5]</h3>
+     <div class="integers-display">
+      <div class="integer-box">
+       6
+      </div>
+      <div class="integer-box">
+       4
+      </div>
+      <div class="integer-box">
+       7
+      </div>
+      <div class="integer-box">
+       3
+      </div>
+      <div class="integer-box">
+       13
+      </div>
+      <div class="integer-box">
+       5
+      </div>
+     </div>
+     <h4 style="margin: 20px 0; color: #2d3748;">Example Equations:</h4>
+     <div class="demo-equation">
+      <div class="demo-input">
+       6 + 4
+      </div>
+      <div class="equals-sign">
+       =
+      </div>
+      <div class="demo-input">
+       7 + 3
+      </div>
+      <div style="color: #48bb78; font-weight: bold;">
+       ✓ (10 = 10)
+      </div>
+     </div>
+     <div class="demo-equation">
+      <div class="demo-input">
+       6 * 5
+      </div>
+      <div class="equals-sign">
+       =
+      </div>
+      <div class="demo-input">
+       (13-3) * (7-4)
+      </div>
+      <div style="color: #48bb78; font-weight: bold;">
+       ✓ (30 = 30)
+      </div>
+     </div>
+    </div><button class="button" onclick="startGame()">Start Playing!</button> <button class="button secondary" onclick="showScreen('screen1')">Back to Menu</button>
+   </div><!-- Screen 2: Game Screen -->
+   <div id="screen2" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="gameRoundInfo">Game 1, Round 1, Equation 1</span> <span id="scoreInfo">Score: 0</span> <span id="timeInfo">Time: 0s</span>
+    </div>
+    <div class="integers-display" id="integersDisplay"><!-- Integers will be populated here -->
+    </div>
+    <div class="equation-area"><input type="text" id="leftField" class="equation-input" placeholder="Enter expression">
+     <div class="equals-sign">
+      =
+     </div><input type="text" id="rightField" class="equation-input" placeholder="Enter expression">
+    </div><button class="button" onclick="submitEquation()">SUBMIT</button>
+    <div id="messageArea" class="message" style="display: none;"></div>
+    <div style="margin-top: 30px;"><button class="button secondary" onclick="nextRound()">GO TO NEXT ROUND</button> <button class="button" onclick="startNewGame()">START ANOTHER GAME</button> <button class="button danger" onclick="showQuitScreen()">QUIT</button>
+    </div>
+   </div><!-- Screen 3: Game Complete -->
+   <div id="screen3" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="finalGameInfo">Game 1 Complete</span> <span id="finalScoreInfo">Final Score: 0</span> <span id="finalTimeInfo">Total Time: 0s</span>
+    </div>
+    <div class="congratulations">
+     <h2>🎉 Congratulations!</h2>
+     <p id="congratsMessage">You have earned 0 points in this game!</p>
+     <p style="margin-top: 15px;">Do you want to continue with another game?</p>
+    </div><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showQuitScreen()">No</button>
+   </div><!-- Screen 4: Quit Screen -->
+   <div id="screen4" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="quitScoreInfo">Last Score: 0</span> <span id="quitTimeInfo">Last Time: 0s</span>
+    </div>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to Quit?</p><button class="button danger" onclick="quitGame()">Yes</button> <button class="button" onclick="showScreen('screen2')">No</button>
+   </div>
+  </div>
+  <script>
+        // Game state
+        let gameState = {
+            currentGame: 1,
+            currentRound: 1,
+            currentEquation: 1,
+            score: 0,
+            startTime: 0,
+            totalTime: 0,
+            roundStartTime: 0,
+            integers: [],
+            usedIntegers: []
+        };
+
+        // Initialize game
+        function initGame() {
+            gameState = {
+                currentGame: 1,
+                currentRound: 1,
+                currentEquation: 1,
+                score: 0,
+                startTime: Date.now(),
+                totalTime: 0,
+                roundStartTime: Date.now(),
+                integers: [],
+                usedIntegers: []
+            };
+            generateNewIntegers();
+            updateDisplay();
+        }
+
+        // Generate 6 unique random integers from 1-16, sorted from lowest to highest
+        function generateNewIntegers() {
+            const uniqueIntegers = new Set();
+            while (uniqueIntegers.size < 6) {
+                uniqueIntegers.add(Math.floor(Math.random() * 16) + 1);
+            }
+            gameState.integers = Array.from(uniqueIntegers).sort((a, b) => a - b);
+            gameState.usedIntegers = [];
+        }
+
+        // Show specific screen
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Show demo
+        function showDemo() {
+            showScreen('demoScreen');
+        }
+
+        // Start game
+        function startGame() {
+            initGame();
+            showScreen('screen2');
+        }
+
+        // Start new game
+        function startNewGame() {
+            gameState.currentGame++;
+            gameState.currentRound = 1;
+            gameState.currentEquation = 1;
+            gameState.score = 0;
+            gameState.startTime = Date.now();
+            gameState.totalTime = 0;
+            gameState.roundStartTime = Date.now();
+            generateNewIntegers();
+            updateDisplay();
+            showScreen('screen2');
+        }
+
+        // Update display
+        function updateDisplay() {
+            // Update game info
+            document.getElementById('gameRoundInfo').textContent = 
+                `Game ${gameState.currentGame}, Round ${gameState.currentRound}, Equation ${gameState.currentEquation}`;
+            document.getElementById('scoreInfo').textContent = `Score: ${gameState.score}`;
+            
+            // Update time
+            const currentTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            document.getElementById('timeInfo').textContent = `Time: ${currentTime}s`;
+            
+            // Update integers display - all integers remain available throughout round
+            const integersDisplay = document.getElementById('integersDisplay');
+            integersDisplay.innerHTML = '';
+            gameState.integers.forEach((num, index) => {
+                const box = document.createElement('div');
+                box.className = 'integer-box';
+                box.textContent = num;
+                integersDisplay.appendChild(box);
+            });
+            
+            // Clear input fields
+            document.getElementById('leftField').value = '';
+            document.getElementById('rightField').value = '';
+            document.getElementById('messageArea').style.display = 'none';
+        }
+
+        // Parse and evaluate mathematical expression
+        function evaluateExpression(expr) {
+            // Remove spaces and evaluate directly
+            const cleanExpr = expr.replace(/\s/g, '');
+            return eval(cleanExpr);
+        }
+
+        // Extract numbers from expression
+        function extractNumbers(expr) {
+            const numbers = expr.match(/\d+/g);
+            return numbers ? numbers.map(Number) : [];
+        }
+
+        // Calculate score based on equation number (progressive doubling, max 1280)
+        function calculateScore(equationNumber) {
+            const baseScore = 10 * Math.pow(2, equationNumber - 1);
+            return Math.min(baseScore, 1280);
+        }
+
+        // Check if numbers are valid (from current integers, each used once per equation)
+        function validateNumbers(numbers) {
+            const availableIntegers = gameState.integers;
+            
+            const usedCount = {};
+            for (const num of numbers) {
+                usedCount[num] = (usedCount[num] || 0) + 1;
+            }
+            
+            const availableCount = {};
+            for (const num of availableIntegers) {
+                availableCount[num] = (availableCount[num] || 0) + 1;
+            }
+            
+            for (const [num, count] of Object.entries(usedCount)) {
+                if (!availableCount[num] || availableCount[num] < count) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Submit equation
+        function submitEquation() {
+            const leftExpr = document.getElementById('leftField').value.trim();
+            const rightExpr = document.getElementById('rightField').value.trim();
+            const messageArea = document.getElementById('messageArea');
+            
+            // Check 1: Empty field validation
+            if (!leftExpr || !rightExpr) {
+                showMessage('Please fill in both fields!', 'error');
+                return;
+            }
+            
+            try {
+                // Evaluate both expressions
+                const leftResult = evaluateExpression(leftExpr);
+                const rightResult = evaluateExpression(rightExpr);
+                
+                // Extract numbers from both expressions
+                const leftNumbers = extractNumbers(leftExpr);
+                const rightNumbers = extractNumbers(rightExpr);
+                const allNumbers = [...leftNumbers, ...rightNumbers];
+                
+                // Check 2: Integer matching and usage validation
+                if (!validateNumbers(allNumbers)) {
+                    showMessage(
+                        'Error: You can only use available integers, and each integer can only be used once per equation. ' +
+                        `Available integers: [${gameState.integers.join(', ')}]. ` +
+                        'Example: "6 + 4" = "7 + 3". Try again!', 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // Check 3: Equation correctness validation
+                if (Math.abs(leftResult - rightResult) < 0.0001) { // Handle floating point precision
+                    // Calculate points for this equation
+                    const points = calculateScore(gameState.currentEquation);
+                    gameState.score += points;
+                    gameState.currentEquation++;
+                    
+                    showMessage(`Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`, 'success');
+                    updateDisplay();
+                } else {
+                    showMessage(
+                        `Incorrect: ${leftExpr} = ${leftResult}, but ${rightExpr} = ${rightResult}. ` +
+                        'Make sure both sides equal the same value. Try again!', 
+                        'error'
+                    );
+                }
+                
+            } catch (error) {
+                showMessage('Invalid expression format. Please check your input.', 'error');
+            }
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.textContent = text;
+            messageArea.className = `message ${type}`;
+            messageArea.style.display = 'block';
+        }
+
+        // Next round
+        function nextRound() {
+            if (gameState.currentRound >= 10) {
+                // Game complete
+                gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+                showGameComplete();
+            } else {
+                gameState.currentRound++;
+                gameState.currentEquation = 1;
+                generateNewIntegers();
+                updateDisplay();
+            }
+        }
+
+        // Show game complete screen
+        function showGameComplete() {
+            document.getElementById('finalGameInfo').textContent = `Game ${gameState.currentGame} Complete`;
+            document.getElementById('finalScoreInfo').textContent = `Final Score: ${gameState.score}`;
+            document.getElementById('finalTimeInfo').textContent = `Total Time: ${gameState.totalTime}s`;
+            document.getElementById('congratsMessage').textContent = 
+                `You have earned ${gameState.score} points in this game!`;
+            
+            showScreen('screen3');
+        }
+
+        // Show quit screen
+        function showQuitScreen() {
+            gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            document.getElementById('quitScoreInfo').textContent = `Last Score: ${gameState.score}`;
+            document.getElementById('quitTimeInfo').textContent = `Last Time: ${gameState.totalTime}s`;
+            showScreen('screen4');
+        }
+
+        // Quit game
+        function quitGame() {
+            showScreen('screen1');
+        }
+
+        // Add enter key support for input fields
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('leftField').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('rightField').focus();
+                }
+            });
+            
+            document.getElementById('rightField').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitEquation();
+                }
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f19834e7c8bf3f',t:'MTc2MDU1NTE5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

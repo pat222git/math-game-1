@@ -1,0 +1,13 @@
+Let's design a math quiz for a solo player.  The quiz title is "Tricia’s Great Math Quiz".  
+How to play?
+A player will play up to 10 rounds in each game.  In each round, 6 integers randomly chosen from integers 1 to 16 will be shown, they are called the "integers_this_round".  
+The quiz is for the player to form correct equations as many times as possible from any of the integers from "integers_this_round" and apply any of math operations: addition, subtraction, multiplication and division.  What he does is type integers and math operations in both "the_left_field" and "the_right_field".  Each integer from "integers_this_round" can only be used once, and he can choose any number of integers from “intergers_this_round”.  There is no limit as to how many and which math operation he uses.  If the mathematical calculations of "the_left_field" and "the_right_field" are the same, the player gets one point.  
+Once the player submits the equation by pressing the “SUBMIT” button, the app should give a warm encouraging message to the player, according to whether his equation is correct or incorrect. 
+One point will be given to the player when he gets the first equation right.  No point will be added or deducted for wrong equation.
+The player can then choose whether he wants to try a second equation with this set of integers, or whether to quit this round and go to a new round with a new set of 6 integers.
+When the player submits the equation, follow the same rules as the first set of equation, except that the scoring will double with every correct attempt, that is, 2 points for the second correct equation, and 4 points for the third correct equation, and so on.
+When the player quits from this round, he can choose to move to the next round.
+He will continue until the end of the 10 rounds, an encouraging message with “Congratulations, you have earned xxx scores in this game.  Do you want to continue?”  If yes, go to the next game of 10 rounds, if no, then quit.
+At the bottom the player can at any time choose whether to go to the next round, start another game, or quit altogether.
+If the player chooses to quit, show the information of the last game, and ask the player to confirm whether he wants to quit.  If yes, say thank you and quit the game, if no, start another game of 10 rounds.
+When the apps is open, before any game, show the “#1_screen” shown below.  If the play wants to see a demo, then show a demo of two equations of the first round.  At the end of the demo, ask if the player is ready to play or quit.  If yes, start round 1 of a new game.  If quit, then exit the app.
