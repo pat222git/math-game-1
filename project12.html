@@ -323,7 +323,13 @@
     <div class="instructions"><strong>Game Instructions:</strong><br><br>
       In each round, you get 6 randomly generated numbers from 1-16. Please make as many equations as possible from any of these numbers (each one to be used once only) and any of math operations: addition (+), subtraction (-), multiplication (*), division (/), and parentheses ( ). You get 5 rounds in each game.
     </div>
-    <p style="font-size: 1.2rem; margin: 30px 0; color: #4a5568;">Do you want to see a demo of the game?</p><button class="button" onclick="showDemo()">Yes, Show Demo</button> <button class="button secondary" onclick="startGame()">No, Start Game</button>
+    <p style="font-size: 1.2rem; margin: 30px 0; color: #4a5568;">Do you want to see a demo of the game?</p><button class="button" onclick="showDemo()">Show Demo</button> <button class="button secondary" onclick="showNicknameScreen()">Start Game</button>
+   </div><!-- Nickname Input Screen -->
+   <div id="nicknameScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <p style="font-size: 1.3rem; margin: 30px 0; color: #4a5568;">Please input your unique nickname</p>
+    <div style="margin: 30px 0;"><input type="text" id="nicknameInput" class="equation-input" placeholder="Enter your nickname" maxlength="20" style="width: 300px;">
+    </div><button class="button" onclick="startGameWithNickname()">Start Game</button> <button class="button secondary" onclick="showScreen('screen1')">Back</button>
    </div><!-- Demo Screen -->
    <div id="demoScreen" class="screen">
     <h1 class="title">🧮 Math Equation Challenge - Demo</h1>
@@ -378,7 +384,7 @@
        ✓ (30 = 30)
       </div>
      </div>
-    </div><button class="button" onclick="startGame()">Start Playing!</button> <button class="button secondary" onclick="showScreen('screen1')">Back to Menu</button>
+    </div><button class="button" onclick="showNicknameScreen()">Start Playing!</button> <button class="button secondary" onclick="showScreen('screen1')">Back to Menu</button>
    </div><!-- Screen 2: Game Screen -->
    <div id="screen2" class="screen">
     <h1 class="title">🧮 Math Equation Challenge</h1>
@@ -392,8 +398,18 @@
      </div><input type="text" id="rightField" class="equation-input" placeholder="Enter expression">
     </div><button class="button" onclick="submitEquation()">SUBMIT</button>
     <div id="messageArea" class="message" style="display: none;"></div>
-    <div style="margin-top: 30px;"><button class="button secondary" onclick="nextRound()">GO TO NEXT ROUND</button> <button class="button" onclick="startNewGame()">START ANOTHER GAME</button> <button class="button danger" onclick="showQuitScreen()">QUIT</button>
+    <div style="margin-top: 30px;"><button class="button secondary" onclick="nextRound()">GO TO NEXT ROUND</button> <button class="button" onclick="showNewGameConfirmation()">START ANOTHER GAME</button> <button class="button danger" onclick="showQuitScreen()">QUIT</button>
     </div>
+   </div><!-- New Game Confirmation Screen -->
+   <div id="newGameScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="newGameScoreInfo">Current Score: 0</span> <span id="newGameTimeInfo">Current Time: 0s</span>
+    </div><!-- Prominent summary box -->
+    <div class="game-summary-box info">
+     <h3>📊 Current Game Summary</h3>
+     <p class="summary-text" id="newGameSummary">You have earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds</p>
+    </div>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to start another game?</p><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showScreen('screen2')">No</button>
    </div><!-- Screen 3: Game Complete -->
    <div id="screen3" class="screen">
     <h1 class="title">🧮 Math Equation Challenge</h1>
@@ -406,8 +422,8 @@
     <div class="congratulations">
      <h2>🎉 Congratulations!</h2>
      <p id="congratsMessage">You have earned 0 points in this game!</p>
-     <p style="margin-top: 15px;">Do you want to continue with another game?</p>
-    </div><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showQuitScreen()">No</button>
+     <p style="margin-top: 15px;">Do you want to continue?</p>
+    </div><button class="button success" onclick="startNewGame()">Start Another Game</button> <button class="button secondary" onclick="showQuitScreen()">Quit</button>
    </div><!-- Screen 4: Quit Screen -->
    <div id="screen4" class="screen">
     <h1 class="title">🧮 Math Equation Challenge</h1>
@@ -417,7 +433,7 @@
      <h3>📊 Current Game Summary</h3>
      <p class="summary-text" id="quitSummary">You earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds</p>
     </div>
-    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to Quit?</p><button class="button danger" onclick="quitGame()">Yes</button> <button class="button" onclick="showScreen('screen2')">No</button>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to Quit?</p><button class="button" onclick="showScreen('screen2')">Play Another Game</button> <button class="button danger" onclick="quitGame()">Quit</button>
    </div>
   </div>
   <script>
@@ -432,8 +448,26 @@
             roundStartTime: 0,
             integers: [],
             usedIntegers: [],
-            submittedEquations: new Set()
+            submittedEquations: new Set(),
+            playerNickname: ''
         };
+
+        // Show nickname screen
+        function showNicknameScreen() {
+            showScreen('nicknameScreen');
+            document.getElementById('nicknameInput').focus();
+        }
+
+        // Start game with nickname
+        function startGameWithNickname() {
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            if (!nickname) {
+                alert('Please enter a nickname to continue!');
+                return;
+            }
+            gameState.playerNickname = nickname;
+            startGame();
+        }
 
         // Initialize game
         function initGame() {
@@ -447,7 +481,8 @@
                 roundStartTime: Date.now(),
                 integers: [],
                 usedIntegers: [],
-                submittedEquations: new Set()
+                submittedEquations: new Set(),
+                playerNickname: gameState.playerNickname
             };
             generateNewIntegers();
             updateDisplay();
@@ -480,6 +515,19 @@
         function startGame() {
             initGame();
             showScreen('screen2');
+        }
+
+        // Show new game confirmation
+        function showNewGameConfirmation() {
+            gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            document.getElementById('newGameScoreInfo').textContent = `Current Score: ${gameState.score}`;
+            document.getElementById('newGameTimeInfo').textContent = `Current Time: ${gameState.totalTime}s`;
+            
+            // Update prominent summary box
+            document.getElementById('newGameSummary').innerHTML = 
+                `You have earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+            
+            showScreen('newGameScreen');
         }
 
         // Start new game
@@ -743,7 +791,14 @@
                     submitEquation();
                 }
             });
+
+            // Add enter key support for nickname input
+            document.getElementById('nicknameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startGameWithNickname();
+                }
+            });
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98fed0ee05da3d96',t:'MTc2MDY5MzgzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9900400611938514',t:'MTc2MDcwODg3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
