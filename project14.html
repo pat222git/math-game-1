@@ -315,6 +315,7 @@
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  </head>
  <body>
   <div class="container"><!-- Screen 1: Welcome Screen -->
@@ -437,6 +438,10 @@
    </div>
   </div>
   <script>
+        // Supabase configuration
+        const supabaseUrl = 'https://rzwnwwieykoxvlgofpfz.supabase.co'  // Replace with your actual URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6d253d2lleWtveHZsZ29mcGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NjgwODIsImV4cCI6MjA3MzQ0NDA4Mn0.1tmJxcoEBb2Ne5cF28qSo_rdqewdKDIIcg0Wc6GAglE'  // Replace with your actual key
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
         // Game state
         let gameState = {
             currentGame: 1,
@@ -777,7 +782,63 @@
         function quitGame() {
             showScreen('screen1');
         }
-
+        // Add the new database functions
+        async function saveGameData() {
+            try {
+                // First, ensure player exists
+                const { data: player, error: playerError } = await supabase
+                    .from('players')
+                    .upsert({ nickname: gameState.playerNickname })
+                    .select()
+                    .single();
+                    
+                if (playerError) throw playerError;
+                
+                // Save game data
+                const { data: game, error: gameError } = await supabase
+                    .from('games')
+                    .insert({
+                        player_id: player.id,
+                        score: gameState.score,
+                        total_time_seconds: gameState.totalTime,
+                        rounds_completed: gameState.currentRound - 1,
+                        equations_solved: gameState.currentEquation - 1,
+                        game_number: gameState.currentGameNumber
+                    })
+                    .select()
+                    .single();
+                    
+                if (gameError) throw gameError;
+                
+                gameState.playerId = player.id;
+                gameState.gameId = game.id;
+                
+                return game;
+            } catch (error) {
+                console.error('Error saving game data:', error);
+                return null;
+            }
+        }
+        
+        async function calculatePercentile(score) {
+            try {
+                const { data: allScores, error } = await supabase
+                    .from('games')
+                    .select('score')
+                    .order('score', { ascending: false });
+                    
+                if (error) throw error;
+                
+                const scores = allScores.map(g => g.score);
+                const betterScores = scores.filter(s => s > score).length;
+                const percentile = Math.round((betterScores / scores.length) * 100);
+                
+                return percentile;
+            } catch (error) {
+                console.error('Error calculating percentile:', error);
+                return null;
+            }
+        }
         // Add enter key support for input fields
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('leftField').addEventListener('keypress', function(e) {
