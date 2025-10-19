@@ -491,7 +491,10 @@
                 integers: [],
                 usedIntegers: [],
                 submittedEquations: new Set(),
-                playerNickname: gameState.playerNickname
+                playerNickname: gameState.playerNickname,
+                playerId: gameState.playerId,
+                gameId: gameState.gameId,
+                currentGameNumber: gameState.currentGameNumber || 1
             };
             generateNewIntegers();
             updateDisplay();
@@ -848,14 +851,14 @@
                 
                 console.log('Step 1 SUCCESS: Player data:', player);
                 
-                // Prepare game data
+                // Prepare game data with safety checks
                 const gameData = {
                     player_id: player.id,
-                    game_number: gameState.currentGameNumber,
-                    final_score: gameState.score,
-                    total_time_seconds: gameState.totalTime,
-                    rounds_completed: gameState.currentRound - 1,
-                    total_equations_solved: gameState.currentEquation - 1,
+                    game_number: gameState.currentGameNumber || 1,
+                    final_score: gameState.score || 0,
+                    total_time_seconds: gameState.totalTime || 0,
+                    rounds_completed: Math.max(0, (gameState.currentRound || 1) - 1),
+                    total_equations_solved: Math.max(0, (gameState.currentEquation || 1) - 1),
                     completed_at: new Date().toISOString()
                 };
                 
