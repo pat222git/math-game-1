@@ -441,7 +441,8 @@
         // Supabase configuration
         const supabaseUrl = 'https://rzwnwwieykoxvlgofpfz.supabase.co'  // Replace with your actual URL
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6d253d2lleWtveHZsZ29mcGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NjgwODIsImV4cCI6MjA3MzQ0NDA4Mn0.1tmJxcoEBb2Ne5cF28qSo_rdqewdKDIIcg0Wc6GAglE'  // Replace with your actual key
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+        const { createClient } = supabase
+        const supabaseClient = createClient(supabaseUrl, supabaseKey)
         // Game state
         let gameState = {
             currentGame: 1,
@@ -454,7 +455,10 @@
             integers: [],
             usedIntegers: [],
             submittedEquations: new Set(),
-            playerNickname: ''
+            playerNickname: '',
+            playerId: null,
+            gameId: null,
+            currentGameNumber: 1
         };
 
         // Show nickname screen
@@ -538,6 +542,7 @@
         // Start new game
         function startNewGame() {
             gameState.currentGame++;
+            gameState.currentGameNumber++;
             gameState.currentRound = 1;
             gameState.currentEquation = 1;
             gameState.score = 0;
@@ -751,12 +756,33 @@
         }
 
         // Show game complete screen
-        function showGameComplete() {
+        async function showGameComplete() {
+            // Save game data
+            const savedGame = await saveGameData();
+            
+            // Calculate percentile
+            const percentile = await calculatePercentile(gameState.score);
+            
+            // Get player stats
+            const playerStats = await getPlayerStats();
+            
+            // Update UI
             document.getElementById('finalGameInfo').textContent = `Game ${gameState.currentGame} Complete`;
             document.getElementById('finalScoreInfo').textContent = `Final Score: ${gameState.score}`;
             document.getElementById('finalTimeInfo').textContent = `Total Time: ${gameState.totalTime}s`;
-            document.getElementById('congratsMessage').textContent = 
-                `You have earned ${gameState.score} points in this game!`;
+            
+            // Create enhanced congratulations message
+            let congratsText = `You have earned ${gameState.score} points in this game!`;
+            
+            if (percentile !== null) {
+                congratsText += `<br><strong>🏆 You scored better than ${100 - percentile}% of all players!</strong>`;
+            }
+            
+            if (playerStats) {
+                congratsText += `<br>📊 Your best score: ${playerStats.bestScore}<br>🎮 Games played: ${playerStats.totalGames}`;
+            }
+            
+            document.getElementById('congratsMessage').innerHTML = congratsText;
             
             // Update prominent summary box
             document.getElementById('gameCompleteSummary').innerHTML = 
@@ -766,14 +792,32 @@
         }
 
         // Show quit screen
-        function showQuitScreen() {
+        async function showQuitScreen() {
             gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            
+            // Save current game if it has progress
+            if (gameState.score > 0) {
+                await saveGameData();
+            }
+            
+            // Get and display stats
+            const playerStats = await getPlayerStats();
+            const percentile = await calculatePercentile(gameState.score);
+            
             document.getElementById('quitScoreInfo').textContent = `Last Score: ${gameState.score}`;
             document.getElementById('quitTimeInfo').textContent = `Last Time: ${gameState.totalTime}s`;
             
-            // Update prominent summary box
-            document.getElementById('quitSummary').innerHTML = 
-                `You earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+            let summaryText = `You earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+            
+            if (percentile !== null && gameState.score > 0) {
+                summaryText += `<br><strong>🏆 You scored better than ${100 - percentile}% of all players!</strong>`;
+            }
+            
+            if (playerStats) {
+                summaryText += `<br>📊 Your best score: ${playerStats.bestScore} | Games played: ${playerStats.totalGames}`;
+            }
+            
+            document.getElementById('quitSummary').innerHTML = summaryText;
             
             showScreen('screen4');
         }
@@ -782,60 +826,125 @@
         function quitGame() {
             showScreen('screen1');
         }
-        // Add the new database functions
+        // Database functions
         async function saveGameData() {
+            console.log('=== saveGameData() START ===');
+            console.log('Game state:', gameState);
+            
             try {
                 // First, ensure player exists
-                const { data: player, error: playerError } = await supabase
+                console.log('Step 1: Upserting player with nickname:', gameState.playerNickname);
+                const { data: player, error: playerError } = await supabaseClient
                     .from('players')
                     .upsert({ nickname: gameState.playerNickname })
                     .select()
                     .single();
                     
-                if (playerError) throw playerError;
+                if (playerError) {
+                    console.error('Player upsert error:', playerError);
+                    alert('Player upsert error: ' + JSON.stringify(playerError));
+                    throw playerError;
+                }
+                
+                console.log('Step 1 SUCCESS: Player data:', player);
+                
+                // Prepare game data
+                const gameData = {
+                    player_id: player.id,
+                    game_number: gameState.currentGameNumber,
+                    final_score: gameState.score,
+                    total_time_seconds: gameState.totalTime,
+                    rounds_completed: gameState.currentRound - 1,
+                    total_equations_solved: gameState.currentEquation - 1,
+                    completed_at: new Date().toISOString()
+                };
+                
+                console.log('Step 2: Inserting game data:', gameData);
                 
                 // Save game data
-                const { data: game, error: gameError } = await supabase
+                const { data: game, error: gameError } = await supabaseClient
                     .from('games')
-                    .insert({
-                        player_id: player.id,
-                        score: gameState.score,
-                        total_time_seconds: gameState.totalTime,
-                        rounds_completed: gameState.currentRound - 1,
-                        equations_solved: gameState.currentEquation - 1,
-                        game_number: gameState.currentGameNumber
-                    })
+                    .insert(gameData)
                     .select()
                     .single();
                     
-                if (gameError) throw gameError;
+                if (gameError) {
+                    console.error('Game insert error:', gameError);
+                    alert('Game insert error: ' + JSON.stringify(gameError));
+                    throw gameError;
+                }
+                
+                console.log('Step 2 SUCCESS: Game data:', game);
                 
                 gameState.playerId = player.id;
                 gameState.gameId = game.id;
                 
+                console.log('=== saveGameData() SUCCESS ===');
                 return game;
+                
             } catch (error) {
-                console.error('Error saving game data:', error);
+                console.error('=== saveGameData() ERROR ===');
+                console.error('Full error object:', error);
+                console.error('Error message:', error.message);
+                console.error('Error code:', error.code);
+                console.error('Error details:', error.details);
+                console.error('Error hint:', error.hint);
+                
+                alert('Database error occurred:\n' + 
+                      'Message: ' + (error.message || 'Unknown error') + '\n' +
+                      'Code: ' + (error.code || 'No code') + '\n' +
+                      'Details: ' + (error.details || 'No details') + '\n' +
+                      'Check console for full details.');
+                
                 return null;
             }
         }
-        
+
         async function calculatePercentile(score) {
             try {
-                const { data: allScores, error } = await supabase
+                const { data: allScores, error } = await supabaseClient
                     .from('games')
-                    .select('score')
-                    .order('score', { ascending: false });
+                    .select('final_score')
+                    .order('final_score', { ascending: false });
                     
                 if (error) throw error;
                 
-                const scores = allScores.map(g => g.score);
+                if (allScores.length === 0) return 0;
+                
+                const scores = allScores.map(g => g.final_score);
                 const betterScores = scores.filter(s => s > score).length;
                 const percentile = Math.round((betterScores / scores.length) * 100);
                 
                 return percentile;
             } catch (error) {
                 console.error('Error calculating percentile:', error);
+                return null;
+            }
+        }
+
+        async function getPlayerStats() {
+            try {
+                if (!gameState.playerId) return null;
+                
+                const { data: stats, error } = await supabaseClient
+                    .from('games')
+                    .select('final_score, total_time_seconds, completed_at')
+                    .eq('player_id', gameState.playerId)
+                    .order('completed_at', { ascending: false });
+                    
+                if (error) throw error;
+                
+                if (!stats || stats.length === 0) return null;
+                
+                return {
+                    totalGames: stats.length,
+                    bestScore: Math.max(...stats.map(s => s.final_score)),
+                    averageScore: Math.round(stats.reduce((sum, s) => sum + s.final_score, 0) / stats.length),
+                    totalTime: stats.reduce((sum, s) => sum + s.total_time_seconds, 0),
+                    recentGames: stats.slice(0, 5)
+                };
+            } catch (error) {
+                console.error('Error getting player stats:', error);
                 return null;
             }
         }
