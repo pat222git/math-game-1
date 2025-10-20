@@ -312,9 +312,6 @@
         }
     </style>
   <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  </head>
  <body>
@@ -763,26 +760,41 @@
             // Save game data
             const savedGame = await saveGameData();
             
-            // Calculate percentile
-            const percentile = await calculatePercentile(gameState.score);
+            // Calculate percentile for CURRENT game
+            const currentPercentile = await calculatePercentile(gameState.score);
             
-            // Get player stats
+            // Get player stats (includes best score)
             const playerStats = await getPlayerStats();
             
-            // Update UI
+            // Calculate percentile for BEST score
+            let bestPercentile = null;
+            if (playerStats && playerStats.bestScore) {
+                bestPercentile = await calculatePercentile(playerStats.bestScore);
+            }
+            
             document.getElementById('finalGameInfo').textContent = `Game ${gameState.currentGame} Complete`;
             document.getElementById('finalScoreInfo').textContent = `Final Score: ${gameState.score}`;
             document.getElementById('finalTimeInfo').textContent = `Total Time: ${gameState.totalTime}s`;
             
-            // Create enhanced congratulations message
+            // Create comprehensive congratulations message
             let congratsText = `You have earned ${gameState.score} points in this game!`;
             
-            if (percentile !== null) {
-                congratsText += `<br><strong>🏆 You scored better than ${100 - percentile}% of all players!</strong>`;
+            // Current game percentile
+            if (currentPercentile !== null) {
+                congratsText += `<br><strong>Current Game: You scored better than ${100 - currentPercentile}% of all players!</strong>`;
             }
             
+            // Player statistics
             if (playerStats) {
-                congratsText += `<br>📊 Your best score: ${playerStats.bestScore}<br>🎮 Games played: ${playerStats.totalGames}`;
+                congratsText += `<br><br>Your Statistics:`;
+                congratsText += `<br>Best Score: ${playerStats.bestScore}`;
+                
+                if (bestPercentile !== null) {
+                    congratsText += ` (better than ${100 - bestPercentile}% of all players)`;
+                }
+                
+                congratsText += `<br>Games Played: ${playerStats.totalGames}`;
+                congratsText += `<br>Average Score: ${playerStats.averageScore}`;
             }
             
             document.getElementById('congratsMessage').innerHTML = congratsText;
@@ -798,26 +810,41 @@
         async function showQuitScreen() {
             gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
             
-            // Save current game if it has progress
-            if (gameState.score > 0) {
-                await saveGameData();
-            }
+            // Always save game data (counts as one game even if incomplete)
+            await saveGameData();
             
-            // Get and display stats
+            // Calculate percentile for current game
+            const currentPercentile = await calculatePercentile(gameState.score);
+            
+            // Get player stats
             const playerStats = await getPlayerStats();
-            const percentile = await calculatePercentile(gameState.score);
+            
+            // Calculate percentile for best score
+            let bestPercentile = null;
+            if (playerStats && playerStats.bestScore) {
+                bestPercentile = await calculatePercentile(playerStats.bestScore);
+            }
             
             document.getElementById('quitScoreInfo').textContent = `Last Score: ${gameState.score}`;
             document.getElementById('quitTimeInfo').textContent = `Last Time: ${gameState.totalTime}s`;
             
             let summaryText = `You earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
             
-            if (percentile !== null && gameState.score > 0) {
-                summaryText += `<br><strong>🏆 You scored better than ${100 - percentile}% of all players!</strong>`;
+            // Current game percentile
+            if (currentPercentile !== null && gameState.score > 0) {
+                summaryText += `<br><strong>Current Game: You scored better than ${100 - currentPercentile}% of all players!</strong>`;
             }
             
+            // Player statistics
             if (playerStats) {
-                summaryText += `<br>📊 Your best score: ${playerStats.bestScore} | Games played: ${playerStats.totalGames}`;
+                summaryText += `<br><br>Your Statistics:`;
+                summaryText += `<br>Best Score: ${playerStats.bestScore}`;
+                
+                if (bestPercentile !== null) {
+                    summaryText += ` (better than ${100 - bestPercentile}% of all players)`;
+                }
+                
+                summaryText += `<br>Games Played: ${playerStats.totalGames} | Average: ${playerStats.averageScore}`;
             }
             
             document.getElementById('quitSummary').innerHTML = summaryText;
@@ -831,25 +858,18 @@
         }
         // Database functions
         async function saveGameData() {
-            console.log('=== saveGameData() START ===');
-            console.log('Game state:', gameState);
-            
             try {
                 // First, ensure player exists
-                console.log('Step 1: Upserting player with nickname:', gameState.playerNickname);
                 const { data: player, error: playerError } = await supabaseClient
                     .from('players')
-                    .upsert({ nickname: gameState.playerNickname })
+                    .upsert({ nickname: gameState.playerNickname }, { onConflict: 'nickname' })
                     .select()
                     .single();
                     
                 if (playerError) {
                     console.error('Player upsert error:', playerError);
-                    alert('Player upsert error: ' + JSON.stringify(playerError));
                     throw playerError;
                 }
-                
-                console.log('Step 1 SUCCESS: Player data:', player);
                 
                 // Prepare game data with safety checks
                 const gameData = {
@@ -862,8 +882,6 @@
                     completed_at: new Date().toISOString()
                 };
                 
-                console.log('Step 2: Inserting game data:', gameData);
-                
                 // Save game data
                 const { data: game, error: gameError } = await supabaseClient
                     .from('games')
@@ -873,32 +891,16 @@
                     
                 if (gameError) {
                     console.error('Game insert error:', gameError);
-                    alert('Game insert error: ' + JSON.stringify(gameError));
                     throw gameError;
                 }
-                
-                console.log('Step 2 SUCCESS: Game data:', game);
                 
                 gameState.playerId = player.id;
                 gameState.gameId = game.id;
                 
-                console.log('=== saveGameData() SUCCESS ===');
                 return game;
                 
             } catch (error) {
-                console.error('=== saveGameData() ERROR ===');
-                console.error('Full error object:', error);
-                console.error('Error message:', error.message);
-                console.error('Error code:', error.code);
-                console.error('Error details:', error.details);
-                console.error('Error hint:', error.hint);
-                
-                alert('Database error occurred:\n' + 
-                      'Message: ' + (error.message || 'Unknown error') + '\n' +
-                      'Code: ' + (error.code || 'No code') + '\n' +
-                      'Details: ' + (error.details || 'No details') + '\n' +
-                      'Check console for full details.');
-                
+                console.error('Database error:', error);
                 return null;
             }
         }
