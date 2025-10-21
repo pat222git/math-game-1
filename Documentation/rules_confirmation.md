@@ -31,3 +31,13 @@ Game info at top
 NEW: Large blue box showing "Game 1 Summary: You earned 150 points"
 "Do you want to Quit?" question
 Yes/No buttons
+
+# Nickname input validation
+Enhanced Nickname Validation (Lines 469-504)
+Added comprehensive validation:
+Empty check - Ensures nickname is entered
+Minimum length - Must be at least 6 characters
+Maximum length - Cannot exceed 20 characters
+No spaces - Prevents spaces in nicknames
+Letters/numbers only - Uses regex /^[a-zA-Z0-9]+$/ to validate
+Case-insensitive storage - Converts to lowercase via nickname.toLowerCase()

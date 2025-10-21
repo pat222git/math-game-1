@@ -325,8 +325,8 @@
    </div><!-- Nickname Input Screen -->
    <div id="nicknameScreen" class="screen">
     <h1 class="title">🧮 Math Equation Challenge</h1>
-    <p style="font-size: 1.3rem; margin: 30px 0; color: #4a5568;">Please input your unique nickname</p>
-    <div style="margin: 30px 0;"><input type="text" id="nicknameInput" class="equation-input" placeholder="Enter your nickname" maxlength="20" style="width: 300px;">
+    <p style="font-size: 1.3rem; margin: 30px 0; color: #4a5568;">Please input your unique nickname<br><span style="font-size: 1rem; color: #718096;">(6-20 characters, letters/numbers only, no spaces)</span></p>
+    <div style="margin: 30px 0;"><input type="text" id="nicknameInput" class="equation-input" placeholder="Enter your nickname" minlength="6" maxlength="20" style="width: 300px;">
     </div><button class="button" onclick="startGameWithNickname()">Start Game</button> <button class="button secondary" onclick="showScreen('screen1')">Back</button>
    </div><!-- Demo Screen -->
    <div id="demoScreen" class="screen">
@@ -468,11 +468,38 @@
         // Start game with nickname
         function startGameWithNickname() {
             const nickname = document.getElementById('nicknameInput').value.trim();
+            
+            // Validation 1: Check if empty
             if (!nickname) {
                 alert('Please enter a nickname to continue!');
                 return;
             }
-            gameState.playerNickname = nickname;
+            
+            // Validation 2: Check length (6-20 characters)
+            if (nickname.length < 6) {
+                alert('Nickname must be at least 6 characters!');
+                return;
+            }
+            
+            if (nickname.length > 20) {
+                alert('Nickname cannot exceed 20 characters!');
+                return;
+            }
+            
+            // Validation 3: Check for spaces
+            if (nickname.includes(' ')) {
+                alert('Nickname cannot contain spaces!');
+                return;
+            }
+            
+            // Validation 4: Check for valid characters (letters and numbers only)
+            if (!/^[a-zA-Z0-9]+$/.test(nickname)) {
+                alert('Nickname can only contain letters and numbers!');
+                return;
+            }
+            
+            // Store nickname in lowercase for case-insensitive uniqueness
+            gameState.playerNickname = nickname.toLowerCase();
             startGame();
         }
 
