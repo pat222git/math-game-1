@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Equation Challenge</title>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            color: #4a5568;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .instructions {
+            background: #f7fafc;
+            border-left: 5px solid #4299e1;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .integers-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .integer-box {
+            background: #4299e1;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .integer-box.used {
+            background: #a0aec0;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .equation-area {
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .equation-input {
+            padding: 15px;
+            border: 3px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            width: 200px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .equation-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .equals-sign {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .button:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .button.secondary {
+            background: #718096;
+        }
+
+        .button.secondary:hover {
+            background: #4a5568;
+        }
+
+        .button.success {
+            background: #48bb78;
+        }
+
+        .button.success:hover {
+            background: #38a169;
+        }
+
+        .button.danger {
+            background: #f56565;
+        }
+
+        .button.danger:hover {
+            background: #e53e3e;
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+
+        .demo-area {
+            background: #edf2f7;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .demo-equation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .demo-input {
+            background: #f7fafc;
+            border: 2px solid #cbd5e0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .congratulations {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.3rem;
+        }
+
+        .game-summary-box {
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .game-summary-box.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: 3px solid #2f855a;
+        }
+
+        .game-summary-box.info {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: 3px solid #2c5282;
+        }
+
+        .game-summary-box h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .summary-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .highlight-score, .highlight-time {
+            font-size: 1.6rem;
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .equation-area {
+                flex-direction: column;
+            }
+            
+            .equation-input {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .integers-display {
+                gap: 10px;
+            }
+            
+            .integer-box {
+                padding: 10px 15px;
+                font-size: 1.2rem;
+                min-width: 50px;
+            }
+
+            .game-summary-box {
+                padding: 20px 15px;
+                margin: 20px 0;
+            }
+            
+            .game-summary-box h3 {
+                font-size: 1.5rem;
+            }
+            
+            .summary-text {
+                font-size: 1.2rem;
+            }
+            
+            .highlight-score, .highlight-time {
+                font-size: 1.3rem;
+                padding: 1px 6px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Screen 1: Welcome Screen -->
+   <div id="screen1" class="screen active">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="instructions"><strong>Game Instructions:</strong><br><br>
+      In each round, you get 6 randomly generated numbers from 1-16. Please make as many equations as possible from any of these numbers (each one to be used once only) and any of math operations: addition (+), subtraction (-), multiplication (*), division (/), and parentheses ( ). You get 5 rounds in each game.
+    </div>
+    <p style="font-size: 1.2rem; margin: 30px 0; color: #4a5568;">Do you want to see a demo of the game?</p><button class="button" onclick="showDemo()">Show Demo</button> <button class="button secondary" onclick="showNicknameScreen()">Start Game</button>
+   </div><!-- Nickname Input Screen -->
+   <div id="nicknameScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <p style="font-size: 1.3rem; margin: 30px 0; color: #4a5568;">Please input your unique nickname<br><span style="font-size: 1rem; color: #718096;">(6-20 characters, letters/numbers only, no spaces)</span></p>
+    <div style="margin: 30px 0;"><input type="text" id="nicknameInput" class="equation-input" placeholder="Enter your nickname" minlength="6" maxlength="20" style="width: 300px;">
+    </div><button class="button" onclick="startGameWithNickname()">Start Game</button> <button class="button secondary" onclick="showScreen('screen1')">Back</button>
+   </div><!-- Demo Screen -->
+   <div id="demoScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge - Demo</h1>
+    <div class="demo-area">
+     <h3 style="margin-bottom: 20px; color: #4a5568;">Demo with integers: [6, 4, 7, 3, 13, 5]</h3>
+     <div class="integers-display">
+      <div class="integer-box">
+       6
+      </div>
+      <div class="integer-box">
+       4
+      </div>
+      <div class="integer-box">
+       7
+      </div>
+      <div class="integer-box">
+       3
+      </div>
+      <div class="integer-box">
+       13
+      </div>
+      <div class="integer-box">
+       5
+      </div>
+     </div>
+     <h4 style="margin: 20px 0; color: #2d3748;">Example Equations:</h4>
+     <div class="demo-equation">
+      <div class="demo-input">
+       6 + 4
+      </div>
+      <div class="equals-sign">
+       =
+      </div>
+      <div class="demo-input">
+       7 + 3
+      </div>
+      <div style="color: #48bb78; font-weight: bold;">
+       ✓ (10 = 10)
+      </div>
+     </div>
+     <div class="demo-equation">
+      <div class="demo-input">
+       6 * 5
+      </div>
+      <div class="equals-sign">
+       =
+      </div>
+      <div class="demo-input">
+       (13-3) * (7-4)
+      </div>
+      <div style="color: #48bb78; font-weight: bold;">
+       ✓ (30 = 30)
+      </div>
+     </div>
+    </div><button class="button" onclick="showNicknameScreen()">Start Playing!</button> <button class="button secondary" onclick="showScreen('screen1')">Back to Menu</button>
+   </div><!-- Screen 2: Game Screen -->
+   <div id="screen2" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="gameRoundInfo">Game 1, Round 1, Equation 1</span> <span id="scoreInfo">Score: 0</span> <span id="timeInfo">Time: 0s</span>
+    </div>
+    <div class="integers-display" id="integersDisplay"><!-- Integers will be populated here -->
+    </div>
+    <div class="equation-area"><input type="text" id="leftField" class="equation-input" placeholder="Enter expression">
+     <div class="equals-sign">
+      =
+     </div><input type="text" id="rightField" class="equation-input" placeholder="Enter expression">
+    </div><button class="button" onclick="submitEquation()">SUBMIT</button>
+    <div id="messageArea" class="message" style="display: none;"></div>
+    <div style="margin-top: 30px;"><button class="button secondary" onclick="nextRound()">GO TO NEXT ROUND</button> <button class="button" onclick="showNewGameConfirmation()">START ANOTHER GAME</button> <button class="button danger" onclick="showQuitScreen()">QUIT</button>
+    </div>
+   </div><!-- New Game Confirmation Screen -->
+   <div id="newGameScreen" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="newGameScoreInfo">Current Score: 0</span> <span id="newGameTimeInfo">Current Time: 0s</span>
+    </div><!-- Prominent summary box -->
+    <div class="game-summary-box info">
+     <h3>📊 Current Game Summary</h3>
+     <p class="summary-text" id="newGameSummary">You have earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds</p>
+    </div>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to start another game?<br>If you want to keep this game data, press No and then Quit.</p><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showScreen('screen2')">No</button>
+   </div><!-- Screen 3: Game Complete -->
+   <div id="screen3" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="finalGameInfo">Game 1 Complete</span> <span id="finalScoreInfo">Final Score: 0</span> <span id="finalTimeInfo">Total Time: 0s</span>
+    </div><!-- Prominent summary box -->
+    <div class="game-summary-box success">
+     <h3>🎉 Game Complete!</h3>
+     <p class="summary-text" id="gameCompleteSummary">You earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds!</p>
+    </div>
+    <div class="congratulations">
+     <h2>🎉 Congratulations!</h2>
+     <p id="congratsMessage">You have earned 0 points in this game!</p>
+     <p style="margin-top: 15px;">Do you want to continue?</p>
+    </div><button class="button success" onclick="startNewGame()">Start Another Game</button> <button class="button secondary" onclick="showQuitScreen()">Quit</button>
+   </div><!-- Screen 4: Quit Screen -->
+   <div id="screen4" class="screen">
+    <h1 class="title">🧮 Math Equation Challenge</h1>
+    <div class="game-info"><span id="quitScoreInfo">Last Score: 0</span> <span id="quitTimeInfo">Last Time: 0s</span>
+    </div><!-- Prominent summary box -->
+    <div class="game-summary-box info">
+     <h3>📊 Current Game Summary</h3>
+     <p class="summary-text" id="quitSummary">You earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds</p>
+    </div>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to Quit?</p><button class="button" onclick="startNewGame()">Play Another Game</button> <button class="button danger" onclick="quitGame()">Quit</button>
+   </div>
+  </div>
+  <script>
+        // Supabase configuration
+        const supabaseUrl = 'https://rzwnwwieykoxvlgofpfz.supabase.co'  // Replace with your actual URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6d253d2lleWtveHZsZ29mcGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NjgwODIsImV4cCI6MjA3MzQ0NDA4Mn0.1tmJxcoEBb2Ne5cF28qSo_rdqewdKDIIcg0Wc6GAglE'  // Replace with your actual key
+        const { createClient } = supabase
+        const supabaseClient = createClient(supabaseUrl, supabaseKey)
+        // Game state
+        let gameState = {
+            currentGame: 1,
+            currentRound: 1,
+            currentEquation: 1,
+            score: 0,
+            startTime: 0,
+            totalTime: 0,
+            roundStartTime: 0,
+            integers: [],
+            usedIntegers: [],
+            submittedEquations: new Set(),
+            playerNickname: '',
+            playerId: null,
+            gameId: null,
+            currentGameNumber: 1,
+            totalEquationsSolved: 0
+        };
+
+        // Show nickname screen
+        function showNicknameScreen() {
+            showScreen('nicknameScreen');
+            document.getElementById('nicknameInput').focus();
+        }
+
+        // Start game with nickname
+        function startGameWithNickname() {
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            
+            // Validation 1: Check if empty
+            if (!nickname) {
+                alert('Please enter a nickname to continue!');
+                return;
+            }
+            
+            // Validation 2: Check length (6-20 characters)
+            if (nickname.length < 6) {
+                alert('Nickname must be at least 6 characters!');
+                return;
+            }
+            
+            if (nickname.length > 20) {
+                alert('Nickname cannot exceed 20 characters!');
+                return;
+            }
+            
+            // Validation 3: Check for spaces
+            if (nickname.includes(' ')) {
+                alert('Nickname cannot contain spaces!');
+                return;
+            }
+            
+            // Validation 4: Check for valid characters (letters and numbers only)
+            if (!/^[a-zA-Z0-9]+$/.test(nickname)) {
+                alert('Nickname can only contain letters and numbers!');
+                return;
+            }
+            
+            // Store nickname in lowercase for case-insensitive uniqueness
+            gameState.playerNickname = nickname.toLowerCase();
+            startGame();
+        }
+
+        // Initialize game
+        function initGame() {
+            gameState = {
+                currentGame: 1,
+                currentRound: 1,
+                currentEquation: 1,
+                score: 0,
+                startTime: Date.now(),
+                totalTime: 0,
+                roundStartTime: Date.now(),
+                integers: [],
+                usedIntegers: [],
+                submittedEquations: new Set(),
+                playerNickname: gameState.playerNickname,
+                playerId: gameState.playerId,
+                gameId: gameState.gameId,
+                currentGameNumber: gameState.currentGameNumber || 1,
+                totalEquationsSolved: 0
+            };
+            generateNewIntegers();
+            updateDisplay();
+        }
+
+        // Generate 6 unique random integers from 1-16, in random order
+        function generateNewIntegers() {
+            const uniqueIntegers = new Set();
+            while (uniqueIntegers.size < 6) {
+                uniqueIntegers.add(Math.floor(Math.random() * 16) + 1);
+            }
+            gameState.integers = Array.from(uniqueIntegers);
+            gameState.usedIntegers = [];
+        }
+
+        // Show specific screen
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Show demo
+        function showDemo() {
+            showScreen('demoScreen');
+        }
+
+        // Start game
+        function startGame() {
+            initGame();
+            showScreen('screen2');
+        }
+
+        // Show new game confirmation
+        function showNewGameConfirmation() {
+            gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            document.getElementById('newGameScoreInfo').textContent = `Current Score: ${gameState.score}`;
+            document.getElementById('newGameTimeInfo').textContent = `Current Time: ${gameState.totalTime}s`;
+            
+            // Update prominent summary box
+            document.getElementById('newGameSummary').innerHTML = 
+                `You have earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+            
+            showScreen('newGameScreen');
+        }
+
+        // Start new game
+        function startNewGame() {
+            gameState.currentGame++;
+            gameState.currentGameNumber++;
+            gameState.currentRound = 1;
+            gameState.currentEquation = 1;
+            gameState.score = 0;
+            gameState.startTime = Date.now();
+            gameState.totalTime = 0;
+            gameState.roundStartTime = Date.now();
+            gameState.submittedEquations.clear();
+            gameState.gameId = null;
+            gameState.totalEquationsSolved = 0;
+            generateNewIntegers();
+            updateDisplay();
+            showScreen('screen2');
+        }
+
+        // Update display
+        function updateDisplay() {
+            // Update game info
+            document.getElementById('gameRoundInfo').textContent = 
+                `Game ${gameState.currentGame}, Round ${gameState.currentRound}, Equation ${gameState.currentEquation}`;
+            document.getElementById('scoreInfo').textContent = `Score: ${gameState.score}`;
+            
+            // Update time
+            const currentTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            document.getElementById('timeInfo').textContent = `Time: ${currentTime}s`;
+            
+            // Update integers display - all integers remain available throughout round
+            const integersDisplay = document.getElementById('integersDisplay');
+            integersDisplay.innerHTML = '';
+            gameState.integers.forEach((num, index) => {
+                const box = document.createElement('div');
+                box.className = 'integer-box';
+                box.textContent = num;
+                integersDisplay.appendChild(box);
+            });
+            
+            // Clear input fields and hide previous messages
+            document.getElementById('leftField').value = '';
+            document.getElementById('rightField').value = '';
+            document.getElementById('messageArea').style.display = 'none';
+        }
+
+        // Parse and evaluate mathematical expression
+        function evaluateExpression(expr) {
+            // Remove spaces and evaluate directly
+            const cleanExpr = expr.replace(/\s/g, '');
+            return eval(cleanExpr);
+        }
+
+        // Extract numbers from expression
+        function extractNumbers(expr) {
+            const numbers = expr.match(/\d+/g);
+            return numbers ? numbers.map(Number) : [];
+        }
+
+        // Calculate score based on number of integers used in the equation
+        function calculateScore(integersUsed) {
+            const integerCount = integersUsed.length;
+            
+            if (integerCount === 3) {
+                return 10;
+            } else if (integerCount === 4) {
+                return 40;
+            } else if (integerCount === 5) {
+                return 80;
+            } else if (integerCount === 6) {
+                return 200;  // BONUS for using all integers!
+            } else {
+                // Fallback for fewer than 3 integers (shouldn't happen in normal gameplay)
+                return 5;
+            }
+        }
+
+        // Normalize expression for commutative operations (addition and multiplication)
+        function normalizeExpression(expr) {
+            // Remove all spaces
+            let normalized = expr.replace(/\s/g, '');
+            
+            // Handle addition: split by + and sort terms (only if pure addition)
+            if (normalized.includes('+') && !normalized.includes('*') && !normalized.includes('/') && !normalized.includes('-') && !normalized.includes('(')) {
+                const terms = normalized.split('+').sort((a, b) => parseInt(a) - parseInt(b));
+                return terms.join('+');
+            }
+            
+            // Handle multiplication: split by * and sort factors (only if pure multiplication)
+            if (normalized.includes('*') && !normalized.includes('+') && !normalized.includes('/') && !normalized.includes('-') && !normalized.includes('(')) {
+                const factors = normalized.split('*').sort((a, b) => parseInt(a) - parseInt(b));
+                return factors.join('*');
+            }
+            
+            // For mixed operations or subtraction/division, return as-is (no commutative normalization)
+            return normalized;
+        }
+
+        // Normalize equation for duplicate detection (treats commutative and swapped equations as identical)
+        function normalizeEquation(leftExpr, rightExpr) {
+            // Normalize each side for commutative operations
+            const normalizedLeft = normalizeExpression(leftExpr);
+            const normalizedRight = normalizeExpression(rightExpr);
+            
+            // Sort both sides to handle equation swapping
+            const sides = [normalizedLeft, normalizedRight].sort();
+            return `${sides[0]}=${sides[1]}`;
+        }
+
+        // Check if numbers are valid (from current integers, each used once per equation)
+        function validateNumbers(numbers) {
+            const availableIntegers = gameState.integers;
+            
+            const usedCount = {};
+            for (const num of numbers) {
+                usedCount[num] = (usedCount[num] || 0) + 1;
+            }
+            
+            const availableCount = {};
+            for (const num of availableIntegers) {
+                availableCount[num] = (availableCount[num] || 0) + 1;
+            }
+            
+            for (const [num, count] of Object.entries(usedCount)) {
+                if (!availableCount[num] || availableCount[num] < count) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Submit equation
+        function submitEquation() {
+            const leftExpr = document.getElementById('leftField').value.trim();
+            const rightExpr = document.getElementById('rightField').value.trim();
+            const messageArea = document.getElementById('messageArea');
+            
+            // Check 1: Empty field validation
+            if (!leftExpr || !rightExpr) {
+                showMessage('Please fill in both fields!', 'error');
+                return;
+            }
+            
+            try {
+                // Evaluate both expressions
+                const leftResult = evaluateExpression(leftExpr);
+                const rightResult = evaluateExpression(rightExpr);
+                
+                // Check 2: Positive results validation
+                if (leftResult < 0 || rightResult < 0) {
+                    showMessage('Negative results not allowed. Try different equations.', 'error');
+                    return;
+                }
+                
+                // Extract numbers from both expressions
+                const leftNumbers = extractNumbers(leftExpr);
+                const rightNumbers = extractNumbers(rightExpr);
+                const allNumbers = [...leftNumbers, ...rightNumbers];
+                
+                // Check 3: Integer matching and usage validation
+                if (!validateNumbers(allNumbers)) {
+                    showMessage(
+                        'Error: You can only use available integers, and each integer can only be used once per equation. ' +
+                        `Available integers: [${gameState.integers.join(', ')}]. ` +
+                        'Example: "6 + 4" = "7 + 3". Try again!', 
+                        'error'
+                    );
+                    return;
+                }
+                
+                // Check 4: Equation correctness validation
+                if (Math.abs(leftResult - rightResult) < 0.0001) { // Handle floating point precision
+                    // Check 5: Duplicate equation validation (with enhanced commutative detection)
+                    const normalizedEq = normalizeEquation(leftExpr, rightExpr);
+                    if (gameState.submittedEquations.has(normalizedEq)) {
+                        showMessage(
+                            'This equation has already been submitted in this round. Please try a different equation!', 
+                            'error'
+                        );
+                        return;
+                    }
+                    
+                    // Add to submitted equations set
+                    gameState.submittedEquations.add(normalizedEq);
+                    
+                    // Calculate points for this equation based on integers used
+                    const points = calculateScore(allNumbers);
+                    gameState.score += points;
+                    gameState.currentEquation++;
+                    gameState.totalEquationsSolved++;
+                    
+                    updateDisplay();
+                    
+                    // Check if all 6 integers were used for special message
+                    let congratsMessage = `Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`;
+
+                    if (allNumbers.length === 6) {
+                        congratsMessage = `🌟 AMAZING! You used all 6 integers! 🌟<br>${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ⭐ BONUS: +${points} points! ⭐<br>This is an exceptional achievement - keep up the brilliant work!`;
+                    }
+
+                    showMessage(congratsMessage, 'success');
+                } else {
+                    showMessage(
+                        `Incorrect: ${leftExpr} = ${leftResult}, but ${rightExpr} = ${rightResult}. ` +
+                        'Make sure both sides equal the same value. Try again!', 
+                        'error'
+                    );
+                }
+                
+            } catch (error) {
+                showMessage('Invalid expression format. Please check your input.', 'error');
+            }
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = text;
+            messageArea.className = `message ${type}`;
+            messageArea.style.display = 'block';
+            messageArea.style.visibility = 'visible';
+            messageArea.style.opacity = '1';
+        }
+
+        // Next round
+        function nextRound() {
+            if (gameState.currentRound >= 5) {
+                // Game complete
+                gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+                showGameComplete();
+            } else {
+                gameState.currentRound++;
+                gameState.currentEquation = 1;
+                gameState.submittedEquations.clear(); // Reset equation tracking for new round
+                generateNewIntegers();
+                updateDisplay();
+            }
+        }
+
+        // Show game complete screen
+        async function showGameComplete() {
+            // Save game data
+            const savedGame = await saveGameData();
+            
+            // Calculate percentile for CURRENT game
+            const currentPercentile = await calculatePercentile(gameState.score);
+            
+            // Get player stats (includes best score)
+            const playerStats = await getPlayerStats();
+            
+            // Calculate percentile for BEST score
+            let bestPercentile = null;
+            if (playerStats && playerStats.bestScore) {
+                bestPercentile = await calculatePercentile(playerStats.bestScore);
+            }
+            
+            document.getElementById('finalGameInfo').textContent = `Game ${gameState.currentGame} Complete`;
+            document.getElementById('finalScoreInfo').textContent = `Final Score: ${gameState.score}`;
+            document.getElementById('finalTimeInfo').textContent = `Total Time: ${gameState.totalTime}s`;
+            
+            // Create comprehensive congratulations message
+            let congratsText = `You have earned ${gameState.score} points in this game!`;
+            
+            // Current game percentile
+            if (currentPercentile !== null) {
+                congratsText += `<br><strong>Current Game: You scored better than ${100 - currentPercentile}% of all players!</strong>`;
+            }
+            
+            // Player statistics
+            if (playerStats) {
+                congratsText += `<br><br>Your Statistics:`;
+                congratsText += `<br>Best Score: ${playerStats.bestScore}`;
+                
+                if (bestPercentile !== null) {
+                    congratsText += ` (better than ${100 - bestPercentile}% of all players)`;
+                }
+                
+                congratsText += `<br>Games Played: ${playerStats.totalGames}`;
+            }
+            
+            document.getElementById('congratsMessage').innerHTML = congratsText;
+            
+            // Update prominent summary box
+            document.getElementById('gameCompleteSummary').innerHTML = 
+                `You earned <span class="highlight-score">${gameState.score}</span> points!`;
+            
+            showScreen('screen3');
+        }
+
+        // Show quit screen
+        async function showQuitScreen() {
+            gameState.totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+            
+            // Always save game data (counts as one game even if incomplete)
+            await saveGameData();
+            
+            // Calculate percentile for current game
+            const currentPercentile = await calculatePercentile(gameState.score);
+            
+            // Get player stats
+            const playerStats = await getPlayerStats();
+            
+            // Calculate percentile for best score
+            let bestPercentile = null;
+            if (playerStats && playerStats.bestScore) {
+                bestPercentile = await calculatePercentile(playerStats.bestScore);
+            }
+            
+            document.getElementById('quitScoreInfo').textContent = `Last Score: ${gameState.score}`;
+            document.getElementById('quitTimeInfo').textContent = `Last Time: ${gameState.totalTime}s`;
+            
+            let summaryText = `You earned <span class="highlight-score">${gameState.score}</span> points`;
+            
+            // Current game percentile
+            if (currentPercentile !== null && gameState.score > 0) {
+                summaryText += `<br><strong>Current Game: You scored better than ${100 - currentPercentile}% of all players!</strong>`;
+            }
+            
+            // Player statistics
+            if (playerStats) {
+                summaryText += `<br><br>Your Statistics:`;
+                summaryText += `<br>Best Score: ${playerStats.bestScore}`;
+                
+                if (bestPercentile !== null) {
+                    summaryText += ` (better than ${100 - bestPercentile}% of all players)`;
+                }
+                
+                summaryText += `<br>Games Played: ${playerStats.totalGames}`;
+            }
+            
+            document.getElementById('quitSummary').innerHTML = summaryText;
+            
+            showScreen('screen4');
+        }
+
+        // Quit game
+        function quitGame() {
+            showScreen('screen1');
+        }
+        // Database functions
+        async function saveGameData() {
+            try {
+                // First, ensure player exists
+                const { data: player, error: playerError } = await supabaseClient
+                    .from('players')
+                    .upsert({ nickname: gameState.playerNickname }, { onConflict: 'nickname' })
+                    .select()
+                    .single();
+                    
+                if (playerError) {
+                    console.error('Player upsert error:', playerError);
+                    throw playerError;
+                }
+                
+                // Prepare game data with safety checks
+                const gameData = {
+                    player_id: player.id,
+                    game_number: gameState.currentGameNumber || 1,
+                    final_score: gameState.score || 0,
+                    total_time_seconds: gameState.totalTime || 0,
+                    rounds_completed: gameState.currentRound,
+                    total_equations_solved: gameState.totalEquationsSolved,
+                    completed_at: new Date().toISOString()
+                };
+                
+                // Save game data
+                const { data: game, error: gameError } = await supabaseClient
+                    .from('games')
+                    .insert(gameData)
+                    .select()
+                    .single();
+                    
+                if (gameError) {
+                    console.error('Game insert error:', gameError);
+                    throw gameError;
+                }
+                
+                gameState.playerId = player.id;
+                gameState.gameId = game.id;
+                
+                return game;
+                
+            } catch (error) {
+                console.error('Database error:', error);
+                return null;
+            }
+        }
+
+        async function calculatePercentile(score) {
+            try {
+                const { data: allScores, error } = await supabaseClient
+                    .from('games')
+                    .select('final_score')
+                    .order('final_score', { ascending: false });
+                    
+                if (error) throw error;
+                
+                if (allScores.length === 0) return 0;
+                
+                const scores = allScores.map(g => g.final_score);
+                const betterScores = scores.filter(s => s > score).length;
+                const percentile = Math.round((betterScores / scores.length) * 100);
+                
+                return percentile;
+            } catch (error) {
+                console.error('Error calculating percentile:', error);
+                return null;
+            }
+        }
+
+        async function getPlayerStats() {
+            try {
+                if (!gameState.playerId) return null;
+                
+                const { data: stats, error } = await supabaseClient
+                    .from('games')
+                    .select('final_score, total_time_seconds, completed_at')
+                    .eq('player_id', gameState.playerId)
+                    .order('completed_at', { ascending: false });
+                    
+                if (error) throw error;
+                
+                if (!stats || stats.length === 0) return null;
+                
+                return {
+                    totalGames: stats.length,
+                    bestScore: Math.max(...stats.map(s => s.final_score)),
+                    averageScore: Math.round(stats.reduce((sum, s) => sum + s.final_score, 0) / stats.length),
+                    totalTime: stats.reduce((sum, s) => sum + s.total_time_seconds, 0),
+                    recentGames: stats.slice(0, 5)
+                };
+            } catch (error) {
+                console.error('Error getting player stats:', error);
+                return null;
+            }
+        }
+        // Add enter key support for input fields
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('leftField').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('rightField').focus();
+                }
+            });
+            
+            document.getElementById('rightField').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitEquation();
+                }
+            });
+
+            // Add enter key support for nickname input
+            document.getElementById('nicknameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startGameWithNickname();
+                }
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9900400611938514',t:'MTc2MDcwODg3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
