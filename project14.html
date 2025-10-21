@@ -599,10 +599,22 @@
             return numbers ? numbers.map(Number) : [];
         }
 
-        // Calculate score based on equation number (progressive doubling, max 1280)
-        function calculateScore(equationNumber) {
-            const baseScore = 10 * Math.pow(2, equationNumber - 1);
-            return Math.min(baseScore, 1280);
+        // Calculate score based on number of integers used in the equation
+        function calculateScore(integersUsed) {
+            const integerCount = integersUsed.length;
+            
+            if (integerCount === 3) {
+                return 10;
+            } else if (integerCount === 4) {
+                return 40;
+            } else if (integerCount === 5) {
+                return 80;
+            } else if (integerCount === 6) {
+                return 200;  // BONUS for using all integers!
+            } else {
+                // Fallback for fewer than 3 integers (shouldn't happen in normal gameplay)
+                return 5;
+            }
         }
 
         // Normalize expression for commutative operations (addition and multiplication)
@@ -714,14 +726,22 @@
                     // Add to submitted equations set
                     gameState.submittedEquations.add(normalizedEq);
                     
-                    // Calculate points for this equation
-                    const points = calculateScore(gameState.currentEquation);
+                    // Calculate points for this equation based on integers used
+                    const points = calculateScore(allNumbers);
                     gameState.score += points;
                     gameState.currentEquation++;
                     gameState.totalEquationsSolved++;
                     
                     updateDisplay();
-                    showMessage(`Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`, 'success');
+                    
+                    // Check if all 6 integers were used for special message
+                    let congratsMessage = `Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`;
+
+                    if (allNumbers.length === 6) {
+                        congratsMessage = `🌟 AMAZING! You used all 6 integers! 🌟<br>${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult})<br>⭐ BONUS: +${points} points! ⭐<br>This is a rare achievement - keep up the brilliant work!`;
+                    }
+
+                    showMessage(congratsMessage, 'success');
                 } else {
                     showMessage(
                         `Incorrect: ${leftExpr} = ${leftResult}, but ${rightExpr} = ${rightResult}. ` +
