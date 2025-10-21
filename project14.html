@@ -455,7 +455,8 @@
             playerNickname: '',
             playerId: null,
             gameId: null,
-            currentGameNumber: 1
+            currentGameNumber: 1,
+            totalEquationsSolved: 0
         };
 
         // Show nickname screen
@@ -491,7 +492,8 @@
                 playerNickname: gameState.playerNickname,
                 playerId: gameState.playerId,
                 gameId: gameState.gameId,
-                currentGameNumber: gameState.currentGameNumber || 1
+                currentGameNumber: gameState.currentGameNumber || 1,
+                totalEquationsSolved: 0
             };
             generateNewIntegers();
             updateDisplay();
@@ -550,6 +552,8 @@
             gameState.totalTime = 0;
             gameState.roundStartTime = Date.now();
             gameState.submittedEquations.clear();
+            gameState.gameId = null;
+            gameState.totalEquationsSolved = 0;
             generateNewIntegers();
             updateDisplay();
             showScreen('screen2');
@@ -714,6 +718,7 @@
                     const points = calculateScore(gameState.currentEquation);
                     gameState.score += points;
                     gameState.currentEquation++;
+                    gameState.totalEquationsSolved++;
                     
                     updateDisplay();
                     showMessage(`Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`, 'success');
@@ -877,8 +882,8 @@
                     game_number: gameState.currentGameNumber || 1,
                     final_score: gameState.score || 0,
                     total_time_seconds: gameState.totalTime || 0,
-                    rounds_completed: Math.max(0, (gameState.currentRound || 1) - 1),
-                    total_equations_solved: Math.max(0, (gameState.currentEquation || 1) - 1),
+                    rounds_completed: gameState.currentRound,
+                    total_equations_solved: gameState.totalEquationsSolved,
                     completed_at: new Date().toISOString()
                 };
                 
