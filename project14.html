@@ -85,6 +85,40 @@
             opacity: 0.6;
         }
 
+        /* Animation for integer boxes - drop down with cascade effect */
+        @keyframes dropInCascade {
+            0% {
+                transform: translateY(-120px);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(15px);
+            }
+            70% {
+                transform: translateY(-8px);
+            }
+            85% {
+                transform: translateY(4px);
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Apply animation only when class is added */
+        .integer-box.animate-drop {
+            animation: dropInCascade 0.8s ease-out;
+        }
+
+        /* Stagger the animations for cascade effect (total 1.5 seconds) */
+        .integer-box.animate-drop:nth-child(1) { animation-delay: 0s; }
+        .integer-box.animate-drop:nth-child(2) { animation-delay: 0.15s; }
+        .integer-box.animate-drop:nth-child(3) { animation-delay: 0.3s; }
+        .integer-box.animate-drop:nth-child(4) { animation-delay: 0.45s; }
+        .integer-box.animate-drop:nth-child(5) { animation-delay: 0.6s; }
+        .integer-box.animate-drop:nth-child(6) { animation-delay: 0.75s; }
+
         .equation-area {
             margin: 30px 0;
             display: flex;
@@ -179,6 +213,36 @@
             border: 2px solid #f56565;
         }
 
+        /* Animation for all message boxes - gentle pulse with glow */
+        @keyframes messagePulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(66, 153, 225, 0);
+            }
+            30% { 
+                transform: scale(1.08);
+                box-shadow: 0 0 20px rgba(66, 153, 225, 0.4);
+            }
+            60% { 
+                transform: scale(1.04);
+                box-shadow: 0 0 15px rgba(66, 153, 225, 0.3);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(66, 153, 225, 0);
+            }
+        }
+
+        /* Apply animation to success messages */
+        .message.success {
+            animation: messagePulse 0.8s ease-in-out;
+        }
+
+        /* Apply animation to info/game data messages */
+        .message.info {
+            animation: messagePulse 0.8s ease-in-out;
+        }
+
         .demo-area {
             background: #edf2f7;
             border-radius: 15px;
@@ -228,6 +292,7 @@
             margin: 25px 0;
             text-align: center;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            animation: messagePulse 0.8s ease-in-out;
         }
 
         .game-summary-box.success {
@@ -606,6 +671,15 @@
                 box.textContent = num;
                 integersDisplay.appendChild(box);
             });
+
+            // Add animation class only at start of new round (not during equation submissions)
+            // Check if this is a new round by seeing if we're on equation 1
+            if (gameState.currentEquation === 1) {
+                setTimeout(() => {
+                    const boxes = integersDisplay.querySelectorAll('.integer-box');
+                    boxes.forEach(box => box.classList.add('animate-drop'));
+                }, 10);
+            }
             
             // Clear input fields and hide previous messages
             document.getElementById('leftField').value = '';
@@ -786,6 +860,14 @@
         function showMessage(text, type) {
             const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = text;
+            
+            // Remove animation class first to reset
+            messageArea.className = 'message';
+            
+            // Force reflow to restart animation
+            void messageArea.offsetWidth;
+            
+            // Add the type class (which includes animation)
             messageArea.className = `message ${type}`;
             messageArea.style.display = 'block';
             messageArea.style.visibility = 'visible';

@@ -34,3 +34,19 @@ This will open the file at 127.0.0.1:5500/project14.html
 Option 2: Click on the file in the directory listing
 In the browser window showing the directory listing, click on project14.html
 This will navigate to your game
+
+# animation effect using CSS
+Animation Requirements Summary
+-- Integer boxes: Drop down with cascade effect (1.5 seconds total) - ONLY at start of new rounds
+-- Message animations: Apply to ALL messages (game data, success equations, 6-integer bonus)
+
+No need to instal any other software
+What You Already Have (and that's all you need):
+Modern web browser (Chrome, Firefox, Edge, Safari)
+CSS animations are natively supported
+JavaScript is built-in
+No plugins or extensions required
+Your current setup
+HTML file (project14.html)
+Supabase connection (already working)
+Live Server (you're already using this for testing)
