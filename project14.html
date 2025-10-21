@@ -499,13 +499,13 @@
             updateDisplay();
         }
 
-        // Generate 6 unique random integers from 1-16, sorted from lowest to highest
+        // Generate 6 unique random integers from 1-16, in random order
         function generateNewIntegers() {
             const uniqueIntegers = new Set();
             while (uniqueIntegers.size < 6) {
                 uniqueIntegers.add(Math.floor(Math.random() * 16) + 1);
             }
-            gameState.integers = Array.from(uniqueIntegers).sort((a, b) => a - b);
+            gameState.integers = Array.from(uniqueIntegers);
             gameState.usedIntegers = [];
         }
 
@@ -799,14 +799,13 @@
                 }
                 
                 congratsText += `<br>Games Played: ${playerStats.totalGames}`;
-                congratsText += `<br>Average Score: ${playerStats.averageScore}`;
             }
             
             document.getElementById('congratsMessage').innerHTML = congratsText;
             
             // Update prominent summary box
             document.getElementById('gameCompleteSummary').innerHTML = 
-                `You earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds!`;
+                `You earned <span class="highlight-score">${gameState.score}</span> points!`;
             
             showScreen('screen3');
         }
@@ -833,7 +832,7 @@
             document.getElementById('quitScoreInfo').textContent = `Last Score: ${gameState.score}`;
             document.getElementById('quitTimeInfo').textContent = `Last Time: ${gameState.totalTime}s`;
             
-            let summaryText = `You earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+            let summaryText = `You earned <span class="highlight-score">${gameState.score}</span> points`;
             
             // Current game percentile
             if (currentPercentile !== null && gameState.score > 0) {
@@ -849,7 +848,7 @@
                     summaryText += ` (better than ${100 - bestPercentile}% of all players)`;
                 }
                 
-                summaryText += `<br>Games Played: ${playerStats.totalGames} | Average: ${playerStats.averageScore}`;
+                summaryText += `<br>Games Played: ${playerStats.totalGames}`;
             }
             
             document.getElementById('quitSummary').innerHTML = summaryText;
