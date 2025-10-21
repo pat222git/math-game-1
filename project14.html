@@ -407,7 +407,7 @@
      <h3>📊 Current Game Summary</h3>
      <p class="summary-text" id="newGameSummary">You have earned <span class="highlight-score">0</span> points in <span class="highlight-time">0</span> seconds</p>
     </div>
-    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to start another game?</p><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showScreen('screen2')">No</button>
+    <p style="font-size: 1.3rem; margin: 40px 0; color: #4a5568;">Do you want to start another game?<br>If you want to keep this game data, press No and then Quit.</p><button class="button success" onclick="startNewGame()">Yes</button> <button class="button secondary" onclick="showScreen('screen2')">No</button>
    </div><!-- Screen 3: Game Complete -->
    <div id="screen3" class="screen">
     <h1 class="title">🧮 Math Equation Challenge</h1>
@@ -738,7 +738,7 @@
                     let congratsMessage = `Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`;
 
                     if (allNumbers.length === 6) {
-                        congratsMessage = `🌟 AMAZING! You used all 6 integers! 🌟<br>${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult})<br>⭐ BONUS: +${points} points! ⭐<br>This is a rare achievement - keep up the brilliant work!`;
+                        congratsMessage = `🌟 AMAZING! You used all 6 integers! 🌟<br>${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ⭐ BONUS: +${points} points! ⭐<br>This is an exceptional achievement - keep up the brilliant work!`;
                     }
 
                     showMessage(congratsMessage, 'success');
@@ -758,7 +758,7 @@
         // Show message
         function showMessage(text, type) {
             const messageArea = document.getElementById('messageArea');
-            messageArea.textContent = text;
+            messageArea.innerHTML = text;
             messageArea.className = `message ${type}`;
             messageArea.style.display = 'block';
             messageArea.style.visibility = 'visible';
