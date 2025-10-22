@@ -1,3 +1,8 @@
+# File backup
+backupproject14 html refers to the game before adding animation effect
+project14 html is the latest version
+
+
 # Security warning during integration with Supabase
 Security warning message "The function has a role-mutable search_path because it does not explicitly set the function's search_path configuration. This means the function will execute under whichever search_path is active for the role that calls it, which is unsafe". 
 Fixing the Search Path Security Warning
@@ -10,6 +15,11 @@ This eliminates the security warning
 # Row based security
 During testing, enable permissive RLS policies
 Before the launch, implement proper authentication and restrictive policies later
+Players: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+Games: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+Game_rounds: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+Equations: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+
 -- Future production policies (don't implement yet)
 -- These require proper authentication setup
 
@@ -50,3 +60,10 @@ Your current setup
 HTML file (project14.html)
 Supabase connection (already working)
 Live Server (you're already using this for testing)
+
+# Github pages launch
+Commit your final code to GitHub repository
+Enable GitHub Pages in repository settings
+Your game will be live at https://yourusername.github.io/repository-name/project14.html
+Test the live version to ensure everything works with GitHub Pages
+Share the link and start collecting real player data!
