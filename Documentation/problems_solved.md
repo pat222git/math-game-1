@@ -15,8 +15,8 @@ This eliminates the security warning
 # Row based security
 During testing, enable permissive RLS policies
 Before the launch, implement proper authentication and restrictive policies later
-Players: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
-Games: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+Players: 4 policies (SELECT, INSERT, UPDATE allowed; DELETE blocked)
+Games: 4 policies (SELECT, INSERT, UPDATE allowed; DELETE blocked)
 Game_rounds: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
 Equations: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
 

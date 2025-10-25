@@ -1,0 +1,371 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 40px;
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.title {
+    color: #4a5568;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.instructions {
+    background: #f7fafc;
+    border-left: 5px solid #4299e1;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.integers-display {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.integer-box {
+    background: #4299e1;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 60px;
+    transition: all 0.3s ease;
+}
+
+.integer-box.used {
+    background: #a0aec0;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Animation for integer boxes - drop down with cascade effect */
+@keyframes dropInCascade {
+    0% {
+        transform: translateY(-120px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(15px);
+    }
+    70% {
+        transform: translateY(-8px);
+    }
+    85% {
+        transform: translateY(4px);
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Apply animation only when class is added */
+.integer-box.animate-drop {
+    animation: dropInCascade 0.8s ease-out;
+}
+
+/* Stagger the animations for cascade effect (total 1.5 seconds) */
+.integer-box.animate-drop:nth-child(1) { animation-delay: 0s; }
+.integer-box.animate-drop:nth-child(2) { animation-delay: 0.15s; }
+.integer-box.animate-drop:nth-child(3) { animation-delay: 0.3s; }
+.integer-box.animate-drop:nth-child(4) { animation-delay: 0.45s; }
+.integer-box.animate-drop:nth-child(5) { animation-delay: 0.6s; }
+.integer-box.animate-drop:nth-child(6) { animation-delay: 0.75s; }
+
+.equation-area {
+    margin: 30px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.equation-input {
+    padding: 15px;
+    border: 3px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    width: 200px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.equation-input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.equals-sign {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+.button {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 10px;
+}
+
+.button:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.button.secondary {
+    background: #718096;
+}
+
+.button.secondary:hover {
+    background: #4a5568;
+}
+
+.button.success {
+    background: #48bb78;
+}
+
+.button.success:hover {
+    background: #38a169;
+}
+
+.button.danger {
+    background: #f56565;
+}
+
+.button.danger:hover {
+    background: #e53e3e;
+}
+
+.message {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.message.success {
+    background: #c6f6d5;
+    color: #22543d;
+    border: 2px solid #48bb78;
+}
+
+.message.error {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 2px solid #f56565;
+}
+
+/* Animation for all message boxes - gentle pulse with glow */
+@keyframes messagePulse {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(66, 153, 225, 0);
+    }
+    30% { 
+        transform: scale(1.08);
+        box-shadow: 0 0 20px rgba(66, 153, 225, 0.4);
+    }
+    60% { 
+        transform: scale(1.04);
+        box-shadow: 0 0 15px rgba(66, 153, 225, 0.3);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(66, 153, 225, 0);
+    }
+}
+
+/* Apply animation to success messages */
+.message.success {
+    animation: messagePulse 0.8s ease-in-out;
+}
+
+/* Apply animation to info/game data messages */
+.message.info {
+    animation: messagePulse 0.8s ease-in-out;
+}
+
+.demo-area {
+    background: #edf2f7;
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+}
+
+.demo-equation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.demo-input {
+    background: #f7fafc;
+    border: 2px solid #cbd5e0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 150px;
+    text-align: center;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.congratulations {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 20px 0;
+    font-size: 1.3rem;
+}
+
+.game-summary-box {
+    padding: 25px;
+    border-radius: 15px;
+    margin: 25px 0;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    animation: messagePulse 0.8s ease-in-out;
+}
+
+.game-summary-box.success {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    border: 3px solid #2f855a;
+}
+
+.game-summary-box.info {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+    border: 3px solid #2c5282;
+}
+
+.game-summary-box h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.summary-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.highlight-score, .highlight-time {
+    font-size: 1.6rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin: 0 2px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .title {
+        font-size: 2rem;
+    }
+    
+    .equation-area {
+        flex-direction: column;
+    }
+    
+    .equation-input {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .integers-display {
+        gap: 10px;
+    }
+    
+    .integer-box {
+        padding: 10px 15px;
+        font-size: 1.2rem;
+        min-width: 50px;
+    }
+
+    .game-summary-box {
+        padding: 20px 15px;
+        margin: 20px 0;
+    }
+    
+    .game-summary-box h3 {
+        font-size: 1.5rem;
+    }
+    
+    .summary-text {
+        font-size: 1.2rem;
+    }
+    
+    .highlight-score, .highlight-time {
+        font-size: 1.3rem;
+        padding: 1px 6px;
+    }
+}
