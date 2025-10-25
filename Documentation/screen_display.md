@@ -53,6 +53,7 @@ The Math Equation Challenge game consists of 6 main screens that guide users thr
 - Title: "🧮 Math Equation Challenge"
 - Game info bar: Round info, Score, Time
 - Dynamic integers display (6 random numbers)
+- Operations hint text (instructional message about available math operations)
 - Equation input fields (left and right sides)
 - Submit button
 - Message area for feedback
