@@ -127,7 +127,7 @@ function showNewGameConfirmation() {
     
     // Update prominent summary box
     document.getElementById('newGameSummary').innerHTML = 
-        `You have earned <span class="highlight-score">${gameState.score}</span> points in <span class="highlight-time">${gameState.totalTime}</span> seconds`;
+        `You have earned <span class="highlight-score">${gameState.score}</span> points`;
     
     showScreen('newGameScreen');
 }
