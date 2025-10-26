@@ -13,12 +13,35 @@ Added SET search_path = public - explicitly sets the search path
 This eliminates the security warning
 
 # Row based security
-During testing, enable permissive RLS policies
-Before the launch, implement proper authentication and restrictive policies later
-Players: 4 policies (SELECT, INSERT, UPDATE allowed; DELETE blocked)
-Games: 4 policies (SELECT, INSERT, UPDATE allowed; DELETE blocked)
+## Final RLS Policy Configuration (Secure for Public Game)
+The application uses a SELECT-then-INSERT pattern instead of UPSERT to avoid needing UPDATE permissions.
+This ensures maximum security while allowing public gameplay without authentication.
+
+### RLS Policies Applied:
+Players: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+Games: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
 Game_rounds: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
 Equations: 4 policies (SELECT, INSERT allowed; UPDATE, DELETE blocked)
+
+### Code Implementation:
+- JavaScript code first attempts SELECT to find existing player
+- Only performs INSERT if player doesn't exist (error code PGRST116)
+- Never uses UPSERT or UPDATE operations
+- All game data is immutable once saved
+
+### Security Benefits:
+1. Public players cannot modify or delete existing records
+2. All game history is preserved and tamper-proof
+3. Database admins retain full control via Supabase Dashboard/SQL Editor
+4. RLS policies only apply to API access (anon/authenticated roles)
+5. Admins can UPDATE/DELETE directly through SQL Editor regardless of RLS
+
+### Admin Access:
+Database administrators maintain full control through:
+- Supabase Dashboard SQL Editor (bypasses RLS)
+- Service role API key (bypasses RLS)
+- Direct PostgreSQL connections
+All UPDATE and DELETE operations work normally for admins.
 
 -- Future production policies (don't implement yet)
 -- These require proper authentication setup

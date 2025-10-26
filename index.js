@@ -4,6 +4,19 @@ const supabaseUrl = 'https://rzwnwwieykoxvlgofpfz.supabase.co'  // Replace with 
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6d253d2lleWtveHZsZ29mcGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NjgwODIsImV4cCI6MjA3MzQ0NDA4Mn0.1tmJxcoEBb2Ne5cF28qSo_rdqewdKDIIcg0Wc6GAglE'  // Replace with your actual key
 const { createClient } = supabase
 const supabaseClient = createClient(supabaseUrl, supabaseKey)
+// Sound effect helper function
+function playSound(soundFile) {
+    try {
+        const audio = new Audio(soundFile);
+        audio.volume = 0.5; // Set volume to 50% to avoid being too loud
+        audio.play().catch(error => {
+            console.log('Sound playback failed:', error);
+        });
+    } catch (error) {
+        console.log('Error creating audio:', error);
+    }
+}
+
 // Game state
 let gameState = {
     currentGame: 1,
@@ -64,6 +77,7 @@ function startGameWithNickname() {
     
     // Store nickname in lowercase for case-insensitive uniqueness
     gameState.playerNickname = nickname.toLowerCase();
+    playSound('1_play success_bell-correct entry.mp3');
     startGame();
 }
 
@@ -115,6 +129,7 @@ function showDemo() {
 
 // Start game
 function startGame() {
+    playSound('1_play success_bell-correct entry.mp3');
     initGame();
     showScreen('screen2');
 }
@@ -134,6 +149,7 @@ function showNewGameConfirmation() {
 
 // Start new game
 function startNewGame() {
+    playSound('1_start-computeraif-14572.mp3');
     gameState.currentGame++;
     gameState.currentGameNumber++;
     gameState.currentRound = 1;
@@ -280,6 +296,7 @@ function submitEquation() {
     
     // Check 1: Empty field validation
     if (!leftExpr || !rightExpr) {
+        playSound('1_error soft system-notification-199277.mp3');
         showMessage('Please fill in both fields!', 'error');
         return;
     }
@@ -291,6 +308,7 @@ function submitEquation() {
         
         // Check 2: Positive results validation
         if (leftResult < 0 || rightResult < 0) {
+            playSound('1_error soft system-notification-199277.mp3');
             showMessage('Negative results not allowed. Try different equations.', 'error');
             return;
         }
@@ -302,6 +320,7 @@ function submitEquation() {
         
         // Check 3: Integer matching and usage validation
         if (!validateNumbers(allNumbers)) {
+            playSound('1_error soft system-notification-199277.mp3');
             showMessage(
                 'Error: You can only use available integers, and each integer can only be used once per equation. ' +
                 `Available integers: [${gameState.integers.join(', ')}]. ` +
@@ -316,6 +335,7 @@ function submitEquation() {
             // Check 5: Duplicate equation validation (with enhanced commutative detection)
             const normalizedEq = normalizeEquation(leftExpr, rightExpr);
             if (gameState.submittedEquations.has(normalizedEq)) {
+                playSound('1_error soft system-notification-199277.mp3');
                 showMessage(
                     'This equation has already been submitted in this round. Please try a different equation!', 
                     'error'
@@ -338,11 +358,15 @@ function submitEquation() {
             let congratsMessage = `Correct! ${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ✓ +${points} points!`;
 
             if (allNumbers.length === 6) {
+                playSound('1_ bonus goodresult-82807.mp3');
                 congratsMessage = `🌟 AMAZING! You used all 6 integers! 🌟<br>${leftExpr} = ${rightExpr} (${leftResult} = ${rightResult}) ⭐ BONUS: +${points} points! ⭐<br>This is an exceptional achievement - keep up the brilliant work!`;
+            } else {
+                playSound('1_play success_bell-correct entry.mp3');
             }
 
             showMessage(congratsMessage, 'success');
         } else {
+            playSound('1_error soft system-notification-199277.mp3');
             showMessage(
                 `Incorrect: ${leftExpr} = ${leftResult}, but ${rightExpr} = ${rightResult}. ` +
                 'Make sure both sides equal the same value. Try again!', 
@@ -351,6 +375,7 @@ function submitEquation() {
         }
         
     } catch (error) {
+        playSound('1_error soft system-notification-199277.mp3');
         showMessage('Invalid expression format. Please check your input.', 'error');
     }
 }
@@ -486,20 +511,36 @@ async function showQuitScreen() {
 
 // Quit game
 function quitGame() {
-    showScreen('screen1');
+    playSound('1_game over windoot-96335.mp3');
+    setTimeout(() => {
+        showScreen('screen1');
+    }, 1500); // 1.5 second delay
 }
 // Database functions
 async function saveGameData() {
     try {
-        // First, ensure player exists
-        const { data: player, error: playerError } = await supabaseClient
+        // First, try to get existing player
+        let { data: player, error: playerError } = await supabaseClient
             .from('players')
-            .upsert({ nickname: gameState.playerNickname }, { onConflict: 'nickname' })
             .select()
+            .eq('nickname', gameState.playerNickname)
             .single();
+        
+        // If player doesn't exist, create new one
+        if (playerError && playerError.code === 'PGRST116') {
+            const { data: newPlayer, error: insertError } = await supabaseClient
+                .from('players')
+                .insert({ nickname: gameState.playerNickname })
+                .select()
+                .single();
             
-        if (playerError) {
-            console.error('Player upsert error:', playerError);
+            if (insertError) {
+                console.error('Player insert error:', insertError);
+                throw insertError;
+            }
+            player = newPlayer;
+        } else if (playerError) {
+            console.error('Player query error:', playerError);
             throw playerError;
         }
         
