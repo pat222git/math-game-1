@@ -144,6 +144,7 @@ function showNewGameConfirmation() {
     document.getElementById('newGameSummary').innerHTML = 
         `You have earned <span class="highlight-score">${gameState.score}</span> points`;
     
+    playSound('1_correct equation material-buy-success.mp3');
     showScreen('newGameScreen');
 }
 
@@ -460,6 +461,7 @@ async function showGameComplete() {
     document.getElementById('gameCompleteSummary').innerHTML = 
         `You earned <span class="highlight-score">${gameState.score}</span> points!`;
     
+    playSound('1_correct equation material-buy-success.mp3');
     showScreen('screen3');
 }
 
@@ -506,6 +508,7 @@ async function showQuitScreen() {
     
     document.getElementById('quitSummary').innerHTML = summaryText;
     
+    playSound('1_correct equation material-buy-success.mp3');
     showScreen('screen4');
 }
 
