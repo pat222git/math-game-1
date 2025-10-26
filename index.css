@@ -69,7 +69,10 @@ body {
     border-radius: 10px;
     font-size: 1.5rem;
     font-weight: bold;
-    min-width: 60px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: all 0.3s ease;
 }
 
@@ -348,7 +351,7 @@ body {
     .integer-box {
         padding: 10px 15px;
         font-size: 1.2rem;
-        min-width: 50px;
+        width: 60px;
     }
 
     .game-summary-box {
